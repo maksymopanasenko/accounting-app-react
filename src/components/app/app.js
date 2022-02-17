@@ -15,11 +15,12 @@ class App extends Component {
         super(props);
         this.state = {
             data: [
-                {name: 'John S.', salary: 800, increase: true, id: 1},
-                {name: 'Tom H.', salary: 3000, increase: false, id: 2},
-                {name: 'Jack D.', salary: 7000, increase: true, id: 3}
+                {name: 'John S.', salary: 800, increase: false, advance: false, id: 1},
+                {name: 'Tom H.', salary: 3000, increase: false, advance: false, id: 2},
+                {name: 'Jack D.', salary: 7000, increase: false, advance: false, id: 3}
             ]
         }
+        this.maxId = 4;
     }
 
     deleteItem = (id) => {
@@ -30,10 +31,50 @@ class App extends Component {
         })
     }
 
+    addItem = (name, salary) => {
+        const newItem = {
+            name, 
+            salary,
+            increase: false,
+            id: this.maxId++
+        }
+        this.setState(({data}) => {
+            const newArr = [...data, newItem];
+            return {
+                data: newArr
+            }
+        });
+    }
+
+    onToggleInc = (id) => {
+        this.setState(({data}) => ({
+            data: data.map(item => {
+                if (item.id === id) {
+                    return {...item, increase: !item.increase}
+                }
+                return {...item}
+            })
+        }));
+    }
+
+    onToggleAdv = (id) => {
+        this.setState(({data}) => ({
+            data: data.map(item => {
+                if (item.id === id) {
+                    return {...item, advance: !item.advance}
+                }
+                return {...item}
+            })
+        }));
+    }
+
     render() {
+        const employees = this.state.data.length;
+        const increase = this.state.data.filter(item => item.increase).length;
+
         return (
             <div className="app">
-                <AppInfo/>
+                <AppInfo employees={employees} increase={increase}/>
     
                 <div className="search-panel">
                     <SearchPanel/>
@@ -43,8 +84,10 @@ class App extends Component {
                 <EmployeesList 
                     data={this.state.data}
                     onDelete={this.deleteItem}
+                    onToggleInc={this.onToggleInc}
+                    onToggleAdv={this.onToggleAdv}
                 />
-                <EmployeesAddForm/>
+                <EmployeesAddForm onAdd={this.addItem}/>
             </div>
         );
     }
